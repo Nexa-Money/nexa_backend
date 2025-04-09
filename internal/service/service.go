@@ -22,7 +22,7 @@ func StartServer(conn *pgx.Conn) {
 	api.Post("/", uh.CreateUser)
 	api.Get("/", uh.GetUsers)
 	api.Get("/:id", uh.GetUserByID)
-	// api.Put("/:id", handler.UpdateUser)
+	api.Put("/:id", uh.UpdateUser)
 	// api.Delete("/:id", handler.DeleteUser)
 
 	app.Listen(":8080")

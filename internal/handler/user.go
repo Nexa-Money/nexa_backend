@@ -58,24 +58,20 @@ func (uh *UserHandler) GetUserByID(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
-// func (uh *UserHandler) UpdateUser(c *fiber.Ctx) error {
-// 	id := c.Params("id")
-// 	var user model.User
+func (uh *UserHandler) UpdateUser(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var user model.User
 
-// 	if err := c.BodyParser(&user); err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Dados inválidos"})
-// 	}
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
 
-// 	user.UpdatedAt = time.Now()
+	if err := uh.UserRepository.UpdateUser(id, user); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
 
-// 	query := "UPDATE users SET name = $1, email = $2, updated_at = $3 WHERE id = $4"
-// 	_, err := database.DB.Exec(context.Background(), query, user.Name, user.Email, user.UpdatedAt, id)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Erro ao atualizar usuário"})
-// 	}
-
-// 	return c.JSON(fiber.Map{"message": "Usuário atualizado com sucesso"})
-// }
+	return c.JSON(fiber.Map{"message": "Usuário atualizado com sucesso"})
+}
 
 // func (uh *UserHandler) DeleteUser(c *fiber.Ctx) error {
 // 	id := c.Params("id")

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"nexa/internal/model"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -63,4 +64,33 @@ func (ur *UserRepository) GetUserByID(id string) (*model.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (ur *UserRepository) UpdateUser(id string, user model.User) error {
+	currentUser, err := ur.GetUserByID(id)
+	if err != nil {
+		return err
+	}
+
+	if user.Name == "" {
+		user.Name = currentUser.Name
+	}
+
+	if user.Email == "" {
+		user.Email = currentUser.Email
+	}
+
+	if user.Password == "" {
+		user.Password = currentUser.Password
+	}
+
+	user.UpdatedAt = time.Now().UTC().Truncate(time.Second)
+
+	query := `UPDATE "user" SET name = $1, email = $2, password = $3, updated_at = $4 WHERE id = $5`
+	_, err = ur.Conn.Exec(context.Background(), query, user.Name, user.Email, user.Password, user.UpdatedAt, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
