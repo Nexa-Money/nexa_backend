@@ -35,7 +35,10 @@ func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.Status(201).JSON(user)
+	return c.Status(201).JSON(fiber.Map{
+		"message": "Usuário criado com sucesso",
+		"id":      user.ID.String(),
+	})
 }
 
 func (uh *UserHandler) GetUsers(c *fiber.Ctx) error {
@@ -73,14 +76,12 @@ func (uh *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Usuário atualizado com sucesso"})
 }
 
-// func (uh *UserHandler) DeleteUser(c *fiber.Ctx) error {
-// 	id := c.Params("id")
+func (uh *UserHandler) DeleteUser(c *fiber.Ctx) error {
+	id := c.Params("id")
 
-// 	query := "DELETE FROM users WHERE id = $1"
-// 	_, err := database.DB.Exec(context.Background(), query, id)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Erro ao excluir usuário"})
-// 	}
+	if err := uh.UserRepository.DeleteUser(id); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
 
-// 	return c.JSON(fiber.Map{"message": "Usuário excluído com sucesso"})
-// }
+	return c.JSON(fiber.Map{"message": "Usuário excluído com sucesso"})
+}

@@ -94,3 +94,14 @@ func (ur *UserRepository) UpdateUser(id string, user model.User) error {
 
 	return nil
 }
+
+func (ur *UserRepository) DeleteUser(id string) error {
+	query := `DELETE FROM "user" WHERE id = $1`
+
+	_, err := ur.Conn.Exec(context.Background(), query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
