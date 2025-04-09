@@ -52,3 +52,15 @@ func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
 	}
 	return users, nil
 }
+
+func (ur *UserRepository) GetUserByID(id string) (*model.User, error) {
+	var user model.User
+
+	query := `SELECT id, name, email, created_at, updated_at FROM "user" WHERE id = $1`
+	err := ur.Conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}

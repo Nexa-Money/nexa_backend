@@ -47,18 +47,16 @@ func (uh *UserHandler) GetUsers(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-// func (uh *UserHandler) GetUserByID(c *fiber.Ctx) error {
-// 	id := c.Params("id")
+func (uh *UserHandler) GetUserByID(c *fiber.Ctx) error {
+	id := c.Params("id")
 
-// 	var user model.User
-// 	query := "SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1"
-// 	err := database.DB.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuário não encontrado"})
-// 	}
+	user, err := uh.UserRepository.GetUserByID(id)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
 
-// 	return c.JSON(user)
-// }
+	return c.JSON(user)
+}
 
 // func (uh *UserHandler) UpdateUser(c *fiber.Ctx) error {
 // 	id := c.Params("id")
