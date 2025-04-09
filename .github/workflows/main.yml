@@ -20,7 +20,9 @@ jobs:
         go-version: '1.21'
 
     - name: Instalar dependências
-      run: go mod tidy
+      run: |
+        go mod tidy
+        go mod download
 
     - name: Verificar formatação (gofmt)
       run: |
