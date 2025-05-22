@@ -7,17 +7,24 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ConnectDB() *pgx.Conn {
+func ConnectDB() *pgxpool.Pool {
 	DB_URI := os.Getenv("DB_URI")
 
-	conn, err := pgx.Connect(context.Background(), DB_URI)
+	config, err := pgxpool.ParseConfig(DB_URI)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("Erro ao configurar conexão com o banco: %v", err)
 	}
 
-	fmt.Println("Database connection successful.")
+	config.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
 
-	return conn
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		log.Fatalf("Erro ao conectar com o banco: %v", err)
+	}
+
+	fmt.Println("Conectado ao banco com sucesso.")
+	return pool
 }
