@@ -4,6 +4,7 @@ import (
 	"nexa/internal/factory"
 	"nexa/internal/model"
 	"nexa/internal/repository"
+	"nexa/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5"
@@ -25,26 +26,39 @@ func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
 	body := new(model.User)
 
 	if err := c.BodyParser(&body); err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"error": "Dados inválidos"})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: fiber.StatusUnprocessableEntity,
+			Message:    "Dados inválidos",
+			Error:      err,
+		})
 	}
 
 	user := uh.UserFactory.CreateUser(*body)
 
 	err := uh.UserRepository.InsertUser(user)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 500,
+			Message:    "Erro interno no servidor",
+			Error:      err,
+		})
 	}
 
-	return c.Status(201).JSON(fiber.Map{
-		"message": "Usuário criado com sucesso",
-		"id":      user.ID.String(),
+	return utils.HttpSuccess(c, utils.SuccessStructure{
+		StatusCode: 201,
+		Message:    "Usuário criado com sucesso",
+		Data:       user,
 	})
 }
 
 func (uh *UserHandler) GetUsers(c *fiber.Ctx) error {
 	users, err := uh.UserRepository.GetAllUsers()
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 500,
+			Message:    "Erro interno no servidor",
+			Error:      err,
+		})
 	}
 
 	return c.JSON(users)
@@ -55,7 +69,11 @@ func (uh *UserHandler) GetUserByID(c *fiber.Ctx) error {
 
 	user, err := uh.UserRepository.GetUserByID(id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 500,
+			Message:    "Erro interno no servidor",
+			Error:      err,
+		})
 	}
 
 	return c.JSON(user)
@@ -66,21 +84,37 @@ func (uh *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	var user model.User
 
 	if err := c.BodyParser(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "Error",
+			Error:      err,
+		})
 	}
 
 	if err := uh.UserRepository.UpdateUser(id, user); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 500,
+			Message:    "Error",
+			Error:      err,
+		})
 	}
 
-	return c.JSON(fiber.Map{"message": "Usuário atualizado com sucesso"})
+	return utils.HttpSuccess(c, utils.SuccessStructure{
+		StatusCode: 200,
+		Message:    "Usuário atualizado com sucesso",
+		Data:       user,
+	})
 }
 
 func (uh *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	if err := uh.UserRepository.DeleteUser(id); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 500,
+			Message:    "Error",
+			Error:      err,
+		})
 	}
 
 	return c.JSON(fiber.Map{"message": "Usuário excluído com sucesso"})
