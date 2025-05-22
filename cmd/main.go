@@ -2,12 +2,14 @@ package main
 
 import (
 	"nexa/internal/database"
+	"nexa/internal/handler"
 	"nexa/internal/service"
 	"nexa/internal/utils"
 )
 
 func main() {
 	utils.LoadEnv()
-	conn := database.ConnectDB()
-	service.StartServer(conn)
+	pool := database.ConnectDB()
+	userHandler := handler.NewUserHandler(pool)
+	service.StartServer(userHandler)
 }
