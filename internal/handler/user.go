@@ -1,13 +1,15 @@
 package handler
 
 import (
+	"fmt"
 	"nexa/internal/factory"
 	"nexa/internal/model"
 	"nexa/internal/repository"
 	"nexa/internal/utils"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v5"
 )
 
 type UserHandler struct {
@@ -15,7 +17,7 @@ type UserHandler struct {
 	UserFactory    factory.UserFactory
 }
 
-func NewUserHandler(conn *pgx.Conn) *UserHandler {
+func NewUserHandler(conn *pgxpool.Pool) *UserHandler {
 	return &UserHandler{
 		UserRepository: *repository.NewUserRepository(conn),
 		UserFactory:    *factory.NewUserFactory(),
@@ -23,9 +25,10 @@ func NewUserHandler(conn *pgx.Conn) *UserHandler {
 }
 
 func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
-	body := new(model.User)
+	var body model.User
 
-	if err := c.BodyParser(&body); err != nil {
+	err := c.BodyParser(&body)
+	if err != nil {
 		return utils.HttpError(c, utils.ErrorStructure{
 			StatusCode: fiber.StatusUnprocessableEntity,
 			Message:    "Dados inválidos",
@@ -33,10 +36,16 @@ func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	user := uh.UserFactory.CreateUser(*body)
-
-	err := uh.UserRepository.InsertUser(user)
+	err = utils.ValidateUser(c, body)
 	if err != nil {
+		return err
+	}
+
+	user := uh.UserFactory.CreateUser(body)
+
+	err = uh.UserRepository.InsertUser(user)
+	if err != nil {
+		fmt.Println("Erro ao inserir usuario: ", err)
 		return utils.HttpError(c, utils.ErrorStructure{
 			StatusCode: 500,
 			Message:    "Erro interno no servidor",

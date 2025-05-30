@@ -6,14 +6,14 @@ import (
 	"nexa/internal/model"
 	"time"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository struct {
-	Conn *pgx.Conn
+	Conn *pgxpool.Pool
 }
 
-func NewUserRepository(conn *pgx.Conn) *UserRepository {
+func NewUserRepository(conn *pgxpool.Pool) *UserRepository {
 	return &UserRepository{
 		Conn: conn,
 	}

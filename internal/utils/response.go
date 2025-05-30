@@ -25,8 +25,5 @@ func HttpSuccess(c *fiber.Ctx, s SuccessStructure) error {
 }
 
 func HttpError(c *fiber.Ctx, e ErrorStructure) error {
-	return c.Status(e.StatusCode).JSON(fiber.Map{
-		"message": e.Message,
-		"error":   e.Error,
-	})
+	return fiber.NewError(e.StatusCode, e.Message)
 }
