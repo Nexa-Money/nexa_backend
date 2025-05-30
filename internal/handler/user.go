@@ -25,10 +25,9 @@ func NewUserHandler(conn *pgxpool.Pool) *UserHandler {
 }
 
 func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
-	body := new(model.User)
+	var body model.User
 
 	err := c.BodyParser(&body)
-
 	if err != nil {
 		return utils.HttpError(c, utils.ErrorStructure{
 			StatusCode: fiber.StatusUnprocessableEntity,
@@ -37,11 +36,12 @@ func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	if err = utils.ValidateUser(c, *body); err != nil {
+	err = utils.ValidateUser(c, body)
+	if err != nil {
 		return err
 	}
 
-	user := uh.UserFactory.CreateUser(*body)
+	user := uh.UserFactory.CreateUser(body)
 
 	err = uh.UserRepository.InsertUser(user)
 	if err != nil {
