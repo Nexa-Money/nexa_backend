@@ -105,3 +105,15 @@ func (ur *UserRepository) DeleteUser(id string) error {
 
 	return nil
 }
+
+func (ur *UserRepository) GetUserByEmail(email string) (*model.User, error) {
+	var user model.User
+	query := `SELECT id, name, email, password, created_at, updated_at FROM "user" WHERE email = $1`
+	err := ur.Conn.QueryRow(context.Background(), query, email).Scan(
+		&user.ID, &user.Name, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

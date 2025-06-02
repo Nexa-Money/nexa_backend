@@ -128,3 +128,41 @@ func (uh *UserHandler) DeleteUser(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "Usuário excluído com sucesso"})
 }
+
+func (uh *UserHandler) LoginUser(c *fiber.Ctx) error {
+	var body model.User
+
+	err := c.BodyParser(&body)
+	if err != nil {
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: fiber.StatusUnprocessableEntity,
+			Message:    "Dados inválidos",
+			Error:      err,
+		})
+	}
+	email := body.Email
+
+	user, err := uh.UserRepository.GetUserByEmail(email)
+	if err != nil {
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 404,
+			Message:    "Usuário não encontrado",
+			Error:      err,
+		})
+	}
+
+	if body.Password != user.Password {
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 401,
+			Message:    "Senha incorreta",
+			Error:      err,
+		})
+	} else {
+		return utils.HttpSuccess(c, utils.SuccessStructure{
+			StatusCode: 200,
+			Message:    "Login bem sucedido",
+			Data:       user,
+		})
+	}
+
+}

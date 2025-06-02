@@ -18,6 +18,7 @@ func StartServer(uh *handler.UserHandler) {
 	api := app.Group("/api/users")
 
 	api.Post("/", uh.CreateUser)
+	api.Post("/login", uh.LoginUser)
 	api.Get("/", uh.GetUsers)
 	api.Get("/:id", uh.GetUserByID)
 	api.Put("/:id", uh.UpdateUser)
