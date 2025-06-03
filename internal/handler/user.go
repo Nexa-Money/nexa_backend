@@ -146,7 +146,7 @@ func (uh *UserHandler) LoginUser(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.HttpError(c, utils.ErrorStructure{
 			StatusCode: 404,
-			Message:    "Usuário não encontrado",
+			Message:    "Email e/ou senha incorretos",
 			Error:      err,
 		})
 	}
@@ -154,7 +154,7 @@ func (uh *UserHandler) LoginUser(c *fiber.Ctx) error {
 	if body.Password != user.Password {
 		return utils.HttpError(c, utils.ErrorStructure{
 			StatusCode: 401,
-			Message:    "Senha incorreta",
+			Message:    "Email e/ou senha incorretos",
 			Error:      err,
 		})
 	} else {
