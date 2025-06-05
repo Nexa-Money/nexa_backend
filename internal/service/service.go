@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
-func StartServer(uh *handler.UserHandler) {
+func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler) {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -23,6 +23,10 @@ func StartServer(uh *handler.UserHandler) {
 	api.Get("/:id", uh.GetUserByID)
 	api.Put("/:id", uh.UpdateUser)
 	api.Delete("/:id", uh.DeleteUser)
+
+	transaction := app.Group("/api/transaction")
+
+	transaction.Post("/", th.CreateTransaction)
 
 	app.Listen(":8080")
 }
