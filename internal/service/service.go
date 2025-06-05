@@ -27,6 +27,7 @@ func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler) {
 	transaction := app.Group("/api/transaction")
 
 	transaction.Post("/", th.CreateTransaction)
+	transaction.Get("/:id", th.GetTransactions)
 
 	app.Listen(":8080")
 }

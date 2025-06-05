@@ -18,19 +18,38 @@ func NewTransactionRepository(conn *pgxpool.Pool) *TransactionRepository {
 	}
 }
 
-func (ur *TransactionRepository) InsertTransaction(transaction *model.Transaction) error {
+func (tr *TransactionRepository) InsertTransaction(transaction *model.Transaction) error {
 	query := `INSERT INTO "transaction" (id, user_id, category, amount, date, description, type, created_at)
 	          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	_, err := ur.Conn.Exec(
+	_, err := tr.Conn.Exec(
 		context.Background(),
 		query,
-		transaction.ID, transaction.UserID, transaction.Category, transaction.Amount, transaction.Date, transaction.Description, transaction.Type, transaction.CreatedAt,
+		&transaction.ID, &transaction.UserID, &transaction.Category, &transaction.Amount, &transaction.Date, &transaction.Description, &transaction.Type, &transaction.CreatedAt,
 	)
 	if err != nil {
-		fmt.Printf("Deu pau aqui: %v", err)
 		return fmt.Errorf("failed to insert transaction: %w", err)
 	}
 
 	return nil
+}
+
+func (tr *TransactionRepository) GetTransactions(id string) ([]model.Transaction, error) {
+	rows, err := tr.Conn.Query(context.Background(), `SELECT id, user_id, category, amount, date, description, type FROM "transaction" WHERE user_id = $1`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var transactions []model.Transaction
+	for rows.Next() {
+		var transaction model.Transaction
+		if err := rows.Scan(&transaction.ID, &transaction.UserID, &transaction.Category, &transaction.Amount, &transaction.Date, &transaction.Description, &transaction.Type); err != nil {
+			return nil, err
+		}
+
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, nil
 }

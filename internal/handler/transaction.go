@@ -52,3 +52,19 @@ func (th *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
 		Data:       transaction,
 	})
 }
+
+func (th *TransactionHandler) GetTransactions(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	transactions, err := th.TransactionRepository.GetTransactions(id)
+
+	if err != nil {
+		return utils.HttpError(c, utils.ErrorStructure{
+			StatusCode: 500,
+			Message:    "Erro interno no servidor",
+			Error:      err,
+		})
+	}
+
+	return c.JSON(transactions)
+}
