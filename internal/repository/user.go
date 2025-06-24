@@ -36,7 +36,7 @@ func (ur *UserRepository) InsertUser(user *model.User) error {
 }
 
 func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
-	rows, err := ur.Conn.Query(context.Background(), `SELECT id, name, email, created_at, updated_at FROM "users"`)
+	rows, err := ur.Conn.Query(context.Background(), `SELECT * FROM "users"`)
 	if err != nil {
 		return nil, err
 	}
