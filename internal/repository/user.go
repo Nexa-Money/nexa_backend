@@ -36,9 +36,9 @@ func (ur *UserRepository) InsertUser(user *model.User) error {
 }
 
 func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
-	rows, err := ur.Conn.Query(context.Background(), `SELECT * FROM "users"`)
+	rows, err := ur.Conn.Query(context.Background(), `SELECT id, name, email, created_at, updated_at FROM "users"`)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query: %w", err)
 	}
 	defer rows.Close()
 
@@ -46,11 +46,12 @@ func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
 	for rows.Next() {
 		var user model.User
 		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to scan: %w", err)
 		}
 
 		users = append(users, user)
 	}
+
 	return users, nil
 }
 

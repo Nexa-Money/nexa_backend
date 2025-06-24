@@ -63,7 +63,6 @@ func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
 func (uh *UserHandler) GetUsers(c *fiber.Ctx) error {
 	users, err := uh.UserRepository.GetAllUsers()
 	if err != nil {
-		return fiber.NewError(500, "Deu erro no get users")
 		return utils.HttpError(c, utils.ErrorStructure{
 			StatusCode: 500,
 			Message:    "Erro interno no servidor",
