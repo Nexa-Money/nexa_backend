@@ -20,7 +20,7 @@ func NewUserRepository(conn *pgxpool.Pool) *UserRepository {
 }
 
 func (ur *UserRepository) InsertUser(user *model.User) error {
-	query := `INSERT INTO "user" (id, name, email, password, created_at, updated_at)
+	query := `INSERT INTO "users" (id, name, email, password, created_at, updated_at)
 	          VALUES ($1, $2, $3, $4, $5, $6)`
 
 	_, err := ur.Conn.Exec(
@@ -36,7 +36,7 @@ func (ur *UserRepository) InsertUser(user *model.User) error {
 }
 
 func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
-	rows, err := ur.Conn.Query(context.Background(), `SELECT id, name, email, created_at, updated_at FROM "user"`)
+	rows, err := ur.Conn.Query(context.Background(), `SELECT id, name, email, created_at, updated_at FROM "users"`)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
 func (ur *UserRepository) GetUserByID(id string) (*model.User, error) {
 	var user model.User
 
-	query := `SELECT id, name, email, created_at, updated_at FROM "user" WHERE id = $1`
+	query := `SELECT id, name, email, created_at, updated_at FROM "users" WHERE id = $1`
 	err := ur.Conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (ur *UserRepository) UpdateUser(id string, user model.User) error {
 
 	user.UpdatedAt = time.Now().UTC().Truncate(time.Second)
 
-	query := `UPDATE "user" SET name = $1, email = $2, password = $3, updated_at = $4 WHERE id = $5`
+	query := `UPDATE "users" SET name = $1, email = $2, password = $3, updated_at = $4 WHERE id = $5`
 	_, err = ur.Conn.Exec(context.Background(), query, user.Name, user.Email, user.Password, user.UpdatedAt, id)
 	if err != nil {
 		return err
@@ -96,7 +96,7 @@ func (ur *UserRepository) UpdateUser(id string, user model.User) error {
 }
 
 func (ur *UserRepository) DeleteUser(id string) error {
-	query := `DELETE FROM "user" WHERE id = $1`
+	query := `DELETE FROM "users" WHERE id = $1`
 
 	_, err := ur.Conn.Exec(context.Background(), query, id)
 	if err != nil {
@@ -108,7 +108,7 @@ func (ur *UserRepository) DeleteUser(id string) error {
 
 func (ur *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 	var user model.User
-	query := `SELECT id, name, email, password, created_at, updated_at FROM "user" WHERE email = $1`
+	query := `SELECT id, name, email, password, created_at, updated_at FROM "users" WHERE email = $1`
 	err := ur.Conn.QueryRow(context.Background(), query, email).Scan(
 		&user.ID, &user.Name, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt,
 	)
