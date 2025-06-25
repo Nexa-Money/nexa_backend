@@ -29,7 +29,7 @@ func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler, ch *ha
 	transaction.Post("/", th.CreateTransaction)
 	transaction.Get("/:id", th.GetTransactions)
 
-	category := api.Group("/:user_id/categories")
+	category := api.Group("/api/:user_id/categories")
 
 	category.Post("/", ch.CreateCategory)
 	category.Get("/", ch.GetCategories)
