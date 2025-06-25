@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
-func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler) {
+func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler, ch *handler.CategoryHandler) {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -28,6 +28,14 @@ func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler) {
 
 	transaction.Post("/", th.CreateTransaction)
 	transaction.Get("/:id", th.GetTransactions)
+
+	category := api.Group("/:user_id/categories")
+
+	category.Post("/", ch.CreateCategory)
+	category.Get("/", ch.GetCategories)
+	category.Get("/:id", ch.GetCategoryByID)
+	category.Put("/:id", ch.UpdateCategory)
+	category.Delete("/:id", ch.DeleteCategory)
 
 	app.Listen(":8080")
 }

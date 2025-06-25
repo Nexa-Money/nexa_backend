@@ -12,5 +12,6 @@ func main() {
 	pool := database.ConnectDB()
 	userHandler := handler.NewUserHandler(pool)
 	transactionHandler := handler.NewTransactionHandler(pool)
-	service.StartServer(userHandler, transactionHandler)
+	categoryHandler := handler.NewCategoryHandler(pool)
+	service.StartServer(userHandler, transactionHandler, categoryHandler)
 }

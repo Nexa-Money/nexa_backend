@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"nexa/internal/model"
+	"nexa/internal/repository"
 	"regexp"
 	"strings"
 
@@ -62,5 +63,38 @@ func ValidateUser(c *fiber.Ctx, u model.User) error {
 		})
 	}
 
+	return nil
+}
+
+func ValidateCategory(c *fiber.Ctx, repo *repository.CategoryRepository, cat model.Category) error {
+	if strings.TrimSpace(cat.Name) == "" {
+		return HttpError(c, ErrorStructure{
+			StatusCode: 400,
+			Message:    "Nome obrigatório",
+			Error:      "O campo 'name' não pode estar vazio.",
+		})
+	}
+
+	if cat.Type != "receita" && cat.Type != "despesa" {
+		return HttpError(c, ErrorStructure{
+			StatusCode: 400,
+			Message:    "Tipo inválido",
+			Error:      "O campo 'type' deve ser 'receita' ou 'despesa'.",
+		})
+	}
+
+	categories, err := repo.GetAllCategories(cat.UserID)
+
+	if err == nil {
+		for _, existing := range categories {
+			if strings.EqualFold(existing.Name, cat.Name) {
+				return HttpError(c, ErrorStructure{
+					StatusCode: 409,
+					Message:    "Categoria já existe",
+					Error:      "Já existe uma categoria com esse nome para este usuário.",
+				})
+			}
+		}
+	}
 	return nil
 }
