@@ -54,9 +54,9 @@ func (th *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
 }
 
 func (th *TransactionHandler) GetTransactions(c *fiber.Ctx) error {
-	id := c.Params("id")
+	userID := c.Params("user_id")
 
-	transactions, err := th.TransactionRepository.GetTransactions(id)
+	transactions, err := th.TransactionRepository.GetTransactions(userID)
 
 	if err != nil {
 		return utils.HttpError(c, utils.ErrorStructure{

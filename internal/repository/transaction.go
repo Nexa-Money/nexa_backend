@@ -19,13 +19,13 @@ func NewTransactionRepository(conn *pgxpool.Pool) *TransactionRepository {
 }
 
 func (tr *TransactionRepository) InsertTransaction(transaction *model.Transaction) error {
-	query := `INSERT INTO "transaction" (id, user_id, category, amount, date, description, type, created_at)
+	query := `INSERT INTO "transaction" (id, user_id, category_id, amount, date, description, type, created_at)
 	          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err := tr.Conn.Exec(
 		context.Background(),
 		query,
-		&transaction.ID, &transaction.UserID, &transaction.Category, &transaction.Amount, &transaction.Date, &transaction.Description, &transaction.Type, &transaction.CreatedAt,
+		&transaction.ID, &transaction.UserID, &transaction.CategoryID, &transaction.Amount, &transaction.Date, &transaction.Description, &transaction.Type, &transaction.CreatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to insert transaction: %w", err)
@@ -35,7 +35,7 @@ func (tr *TransactionRepository) InsertTransaction(transaction *model.Transactio
 }
 
 func (tr *TransactionRepository) GetTransactions(id string) ([]model.Transaction, error) {
-	rows, err := tr.Conn.Query(context.Background(), `SELECT id, user_id, category, amount, date, description, type FROM "transaction" WHERE user_id = $1`, id)
+	rows, err := tr.Conn.Query(context.Background(), `SELECT id, user_id, category_id, amount, date, description, type, created_at FROM "transaction" WHERE user_id = $1`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (tr *TransactionRepository) GetTransactions(id string) ([]model.Transaction
 	var transactions []model.Transaction
 	for rows.Next() {
 		var transaction model.Transaction
-		if err := rows.Scan(&transaction.ID, &transaction.UserID, &transaction.Category, &transaction.Amount, &transaction.Date, &transaction.Description, &transaction.Type); err != nil {
+		if err := rows.Scan(&transaction.ID, &transaction.UserID, &transaction.CategoryID, &transaction.Amount, &transaction.Date, &transaction.Description, &transaction.Type, &transaction.CreatedAt); err != nil {
 			return nil, err
 		}
 

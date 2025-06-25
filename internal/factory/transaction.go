@@ -17,7 +17,7 @@ func (tf *TransactionFactory) CreateTransaction(transaction model.Transaction) *
 	return &model.Transaction{
 		ID:          uuid.New(),
 		UserID:      transaction.UserID,
-		Category:    transaction.Category,
+		CategoryID:  transaction.CategoryID,
 		Amount:      transaction.Amount,
 		Date:        transaction.Date,
 		Description: transaction.Description,
