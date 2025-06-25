@@ -24,12 +24,12 @@ func StartServer(uh *handler.UserHandler, th *handler.TransactionHandler, ch *ha
 	api.Put("/:id", uh.UpdateUser)
 	api.Delete("/:id", uh.DeleteUser)
 
-	transaction := app.Group("/api/transaction")
+	transaction := api.Group("/:user_id/transactions")
 
 	transaction.Post("/", th.CreateTransaction)
-	transaction.Get("/:id", th.GetTransactions)
+	transaction.Get("/", th.GetTransactions)
 
-	category := api.Group("/api/:user_id/categories")
+	category := api.Group("/:user_id/categories")
 
 	category.Post("/", ch.CreateCategory)
 	category.Get("/", ch.GetCategories)
